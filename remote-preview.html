@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#1a1a1e">
+<meta name="theme-color" content="#111114">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Bedbugs Remote</title>
 <style>
@@ -11,63 +11,39 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
   :root{
-    --shell:#1e1f23;
-    --btn-bg:#2a2b30;
-    --btn-bg-h:#323338;
-    --btn-shadow:0 2px 4px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
-    --btn-active:0 1px 2px rgba(0,0,0,.3), inset 0 1px 2px rgba(0,0,0,.2);
-    --t:#c8c9cf;
-    --t2:#6e7080;
-    --red:#e63946;
-    --red-dim:#c0313d;
-    --grn:#4ade80;
-    --ir:#ff2020;
+    --bg:#111114;
+    --shell:#1a1b1f;
+    --btn-bg:#252630;
+    --btn-bg-h:#2e2f3a;
+    --btn-shadow:0 2px 4px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03);
+    --btn-active:0 1px 2px rgba(0,0,0,.3),inset 0 1px 2px rgba(0,0,0,.2);
+    --t:#c8c9cf;--t2:#6e7080;--t3:#3a3b48;
+    --red:#e63946;--red-dim:#c0313d;
+    --grn:#4ade80;--ir:#ff2020;
+    --r:14px
   }
 
   html,body{
     height:100%;overflow:hidden;
-    background:#111114;
+    background:var(--bg);
     font-family:'Outfit',sans-serif;
     color:var(--t);
     touch-action:manipulation;
   }
 
-  /* ── Remote shell ── */
-  .remote{
-    position:relative;
-    width:100%;max-width:320px;
-    margin:0 auto;
-    min-height:100vh;
+  .app{
     display:flex;flex-direction:column;
-    align-items:center;
-    padding:24px 20px;
-    padding-top:max(24px, env(safe-area-inset-top));
-    padding-bottom:max(24px, env(safe-area-inset-bottom));
-    background:linear-gradient(180deg, #222228 0%, var(--shell) 8%, var(--shell) 92%, #1a1a1e 100%);
-    border-radius:36px;
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.03),
-      0 20px 60px rgba(0,0,0,.5),
-      inset 0 1px 0 rgba(255,255,255,.04);
-  }
-
-  /* Subtle texture */
-  .remote::before{
-    content:'';position:absolute;inset:0;border-radius:36px;
-    opacity:.015;pointer-events:none;
-    background:url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='white'/%3E%3C/svg%3E");
-    background-size:4px 4px;
+    height:100%;width:100%;
+    padding:16px;
+    padding-top:max(16px, env(safe-area-inset-top));
+    padding-bottom:max(16px, env(safe-area-inset-bottom));
   }
 
   /* ── IR LED ── */
-  .ir-area{
-    width:100%;display:flex;justify-content:center;
-    padding-bottom:20px;flex-shrink:0;
-  }
+  .ir-area{display:flex;justify-content:center;padding-bottom:14px;flex-shrink:0}
   .ir-led{
     width:16px;height:16px;border-radius:50%;
-    background:#1a1a1e;
-    border:1px solid #2a2a2e;
+    background:#1a1a1e;border:1px solid #2a2a2e;
     transition:background .06s,box-shadow .06s,border-color .06s;
   }
   .ir-led.on{
@@ -76,15 +52,16 @@
     border-color:rgba(255,32,32,.3);
   }
 
-  /* ── Status row ── */
-  .status-row{
-    width:100%;display:flex;align-items:center;justify-content:space-between;
-    padding-bottom:20px;flex-shrink:0;
+  /* ── Header ── */
+  .hd{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:12px;border-bottom:1px solid #1e1f26;
+    flex-shrink:0;
   }
-  .brand{font-size:15px;font-weight:500;letter-spacing:.5px;color:var(--t)}
+  .brand{font-size:15px;font-weight:500;letter-spacing:.5px}
   .badge{
-    font-size:10px;font-weight:400;padding:4px 10px;border-radius:16px;
-    display:flex;align-items:center;gap:5px;letter-spacing:.2px;
+    font-size:9px;font-weight:500;padding:3px 9px;border-radius:14px;
+    display:flex;align-items:center;gap:4px;letter-spacing:.2px;
   }
   .badge.ok{background:rgba(74,222,128,.07);color:var(--grn);border:1px solid rgba(74,222,128,.15)}
   .badge.no{background:rgba(255,255,255,.03);color:var(--t2);border:1px solid rgba(255,255,255,.06)}
@@ -92,100 +69,101 @@
   .badge.ok .bdot{animation:pulse 2.5s ease infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
 
-  /* ── Controls ── */
-  .controls{
-    flex:1;width:100%;
-    display:flex;flex-direction:column;
-    gap:10px;justify-content:center;
+  /* ── Now Playing card ── */
+  .now-playing{
+    margin-top:14px;
+    padding:14px 16px;
+    background:var(--shell);
+    border-radius:12px;
+    border:1px solid #222230;
+    flex-shrink:0;
+    transition:opacity .3s;
   }
-  .row{display:flex;gap:10px}
+  .np-idle{text-align:center;color:var(--t2);font-size:12px;padding:8px 0}
+  .np-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:6px}
+  .np-title{font-size:15px;font-weight:500;color:#fff;margin-bottom:2px}
+  .np-episode{font-size:11px;color:var(--t2);font-weight:400}
+  .np-site{
+    display:inline-block;font-size:9px;font-weight:500;
+    padding:2px 7px;border-radius:6px;margin-top:8px;
+    background:rgba(255,255,255,.04);color:var(--t2);
+    letter-spacing:.3px;text-transform:uppercase;
+  }
+
+  /* ── Controls ── */
+  .ctl{
+    flex:1;display:flex;flex-direction:column;
+    gap:8px;justify-content:center;
+    padding:14px 0;
+  }
+  .row{display:flex;gap:8px}
   .row>.btn{flex:1}
 
   /* ── Button ── */
   .btn{
-    position:relative;
     display:flex;align-items:center;justify-content:center;
-    gap:6px;
-    height:52px;
-    border:none;
-    border-radius:16px;
-    background:var(--btn-bg);
-    box-shadow:var(--btn-shadow);
-    color:var(--t);
-    font-family:inherit;font-size:12px;font-weight:400;letter-spacing:.2px;
+    gap:6px;height:52px;
+    border:none;border-radius:var(--r);
+    background:var(--btn-bg);box-shadow:var(--btn-shadow);
+    color:var(--t);font-family:inherit;font-size:12px;font-weight:400;letter-spacing:.2px;
     cursor:pointer;
-    transition:transform .06s ease,background .08s ease,box-shadow .08s ease;
+    transition:transform .06s,background .08s,box-shadow .08s,opacity .3s;
     user-select:none;-webkit-user-select:none;
-    outline:none;
-    -webkit-appearance:none;
+    outline:none;-webkit-appearance:none;
   }
-
-  .btn:active{
-    transform:scale(.97) translateY(1px);
-    background:var(--btn-bg-h);
-    box-shadow:var(--btn-active);
-  }
-
+  .btn:active{transform:scale(.97) translateY(1px);background:var(--btn-bg-h);box-shadow:var(--btn-active)}
   .btn .ic{font-size:15px;line-height:1}
 
-  /* Play/Pause — hero button */
+  /* Play/Pause hero */
   .btn--play{
-    height:68px;font-size:14px;font-weight:500;
-    border-radius:20px;
-    background:linear-gradient(180deg,#2e2f34 0%,#28292e 100%);
+    height:68px;font-size:14px;font-weight:500;border-radius:18px;
+    background:linear-gradient(180deg,#2a2b32 0%,#242530 100%);
   }
-  .btn--play:active{
-    background:linear-gradient(180deg,#343540 0%,#2e2f36 100%);
-  }
+  .btn--play:active{background:linear-gradient(180deg,#32333c 0%,#2c2d38 100%)}
   .btn--play .ic{font-size:22px}
 
   /* Red accent */
   .btn--r{
-    background:var(--red);
-    color:#fff;
+    background:var(--red);color:#fff;
     box-shadow:0 2px 8px rgba(230,57,70,.25),inset 0 1px 0 rgba(255,255,255,.08);
   }
-  .btn--r:active{
-    background:var(--red-dim);
-    box-shadow:0 1px 4px rgba(230,57,70,.2),inset 0 1px 2px rgba(0,0,0,.15);
-  }
+  .btn--r:active{background:var(--red-dim);box-shadow:0 1px 4px rgba(230,57,70,.2),inset 0 1px 2px rgba(0,0,0,.15)}
 
-  /* Smaller util row */
+  /* Disabled state */
+  .btn.disabled{opacity:.25;pointer-events:none}
+
+  /* Small util */
   .btn--sm{height:46px;font-size:11px}
 
-  /* Divider */
-  .divider{
-    width:60px;height:1px;
-    background:rgba(255,255,255,.04);
-    margin:4px auto;
-    border-radius:1px;
-  }
+  .divider{width:60px;height:1px;background:rgba(255,255,255,.04);margin:2px auto;border-radius:1px}
 
   /* ── Footer ── */
-  .ft{
-    font-size:9px;color:var(--t2);letter-spacing:.5px;
-    padding-top:16px;flex-shrink:0;opacity:.5;
-  }
+  .ft{font-size:8px;color:var(--t3);text-align:center;letter-spacing:.5px;padding-top:8px;flex-shrink:0}
 
   /* ── Entrance ── */
-  .controls .row:nth-child(1){animation:rise .3s ease .05s both}
-  .controls .btn--play{animation:rise .3s ease .12s both}
-  .controls .row:nth-child(3){animation:rise .3s ease .19s both}
-  .controls .divider{animation:rise .3s ease .24s both}
-  .controls .row:nth-child(5){animation:rise .3s ease .28s both}
-  .controls .btn--r.full{animation:rise .3s ease .34s both}
+  .ctl .row:nth-child(1){animation:rise .3s ease .05s both}
+  .ctl .btn--play{animation:rise .3s ease .1s both}
+  .ctl .row:nth-child(3){animation:rise .3s ease .15s both}
+  .ctl .divider{animation:rise .3s ease .2s both}
+  .ctl .row:nth-child(5){animation:rise .3s ease .25s both}
+  .ctl .btn--r.full{animation:rise .3s ease .3s both}
   @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── Error screen ── */
+  .err{
+    flex:1;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    gap:10px;color:var(--t2);font-size:13px;text-align:center;line-height:1.6;
+  }
 </style>
 </head>
 <body>
 
-<div class="remote">
+<div class="app" id="app">
 
-  <div class="ir-area">
-    <div class="ir-led" id="ir"></div>
-  </div>
+  <div class="ir-area"><div class="ir-led" id="ir"></div></div>
 
-  <div class="status-row">
+  <div class="hd">
     <span class="brand">Bedbugs</span>
     <div class="badge no" id="status">
       <span class="bdot"></span>
@@ -193,44 +171,42 @@
     </div>
   </div>
 
-  <div class="controls">
+  <div class="now-playing" id="np">
+    <div class="np-idle" id="np-idle">Start watching something!</div>
+    <div id="np-info" style="display:none">
+      <div class="np-label">Now Playing</div>
+      <div class="np-title" id="np-title"></div>
+      <div class="np-episode" id="np-ep"></div>
+      <div class="np-site" id="np-site"></div>
+    </div>
+  </div>
 
+  <div class="ctl">
     <div class="row">
-      <button class="btn btn--r" data-a="skipIntro">Skip Intro</button>
-      <button class="btn btn--r" data-a="skipRecap">Skip Recap</button>
+      <button class="btn btn--r disabled" data-a="skipIntro" id="btn-skip">Skip</button>
     </div>
 
-    <button class="btn btn--play" data-a="playPause">
-      <span class="ic">❚❚</span>
-      Play / Pause
+    <button class="btn btn--play" data-a="playPause" id="btn-pp">
+      <span class="ic">❚❚</span> Play / Pause
     </button>
 
     <div class="row">
-      <button class="btn" data-a="seekBack">
-        <span class="ic">↻</span> −10s
-      </button>
-      <button class="btn" data-a="seekForward">
-        <span class="ic">↺</span> +10s
-      </button>
+      <button class="btn" data-a="seekBack"><span class="ic">↻</span> −10s</button>
+      <button class="btn" data-a="seekForward"><span class="ic">↺</span> +10s</button>
     </div>
 
     <div class="divider"></div>
 
     <div class="row">
-      <button class="btn btn--sm" data-a="mute">
-        <span class="ic">🔇</span> Mute
-      </button>
-      <button class="btn btn--sm" data-a="fullscreen">
-        <span class="ic">⛶</span> Fullscreen
-      </button>
+      <button class="btn btn--sm" data-a="mute"><span class="ic">🔇</span> Mute</button>
+      <button class="btn btn--sm" data-a="fullscreen"><span class="ic">⛶</span> Fullscreen</button>
     </div>
 
     <button class="btn btn--r full" data-a="nextEpisode">Next Episode →</button>
-
   </div>
 
-  <div class="ft">
-    <span class="sid">------</span>
+  <div class="ft" id="ft">
+    <span id="ft-sid">------</span>
   </div>
 
 </div>
@@ -298,6 +274,14 @@ var TinyMQTT=(function(){
 var BROKER='wss://broker.hivemq.com:8884/mqtt';
 var irLed=document.getElementById('ir');
 var irTimer=null;
+var btnSkip=document.getElementById('btn-skip');
+var npIdle=document.getElementById('np-idle');
+var npInfo=document.getElementById('np-info');
+var npTitle=document.getElementById('np-title');
+var npEp=document.getElementById('np-ep');
+var npSite=document.getElementById('np-site');
+
+var SITE_LABELS={hbo:'HBO Max',max:'Max',netflix:'Netflix'};
 
 function getParams(){
   var p={},s=location.search.substring(1),parts=s.split('&');
@@ -317,43 +301,78 @@ function fireIR(){
   irTimer=setTimeout(function(){irLed.classList.remove('on')},180);
 }
 
-if(!sid||!secret){
-  var ctl=document.querySelector('.controls');
-  if(ctl){
-    ctl.innerHTML='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--t2);font-size:13px;text-align:center;line-height:1.6">'
-      +'<div style="font-size:28px;margin-bottom:4px">🐛</div>'
-      +'<div style="font-weight:500;color:var(--t)">No session</div>'
-      +'<div>Open the Bedbugs extension on<br>your desktop and scan the QR.</div></div>';
+function updateNowPlaying(data){
+  if(!data || data.state==='idle' || !data.hasVideo){
+    npIdle.style.display='';
+    npInfo.style.display='none';
+    npIdle.textContent='Start watching something!';
+    btnSkip.classList.add('disabled');
+    return;
   }
+
+  npIdle.style.display='none';
+  npInfo.style.display='';
+
+  npTitle.textContent=data.title||'Unknown';
+
+  var epParts=[];
+  if(data.episode) epParts.push(data.episode);
+  if(data.episodeName) epParts.push(data.episodeName);
+  npEp.textContent=epParts.join(' · ')||'';
+
+  npSite.textContent=SITE_LABELS[data.site]||data.site||'';
+  npSite.style.display=data.site?'':'none';
+
+  // Skip button
+  if(data.skipAvailable){
+    btnSkip.classList.remove('disabled');
+  } else {
+    btnSkip.classList.add('disabled');
+  }
+}
+
+if(!sid||!secret){
+  var app=document.getElementById('app');
+  app.innerHTML='<div class="err"><div style="font-size:28px;margin-bottom:4px">🐛</div>'
+    +'<div style="font-weight:500;color:var(--t)">No session</div>'
+    +'<div>Open the Bedbugs extension on your<br>desktop and scan the QR.</div></div>';
 } else {
-  var topic='bedbugs/'+sid+'/cmd';
+  var cmdTopic='bedbugs/'+sid+'/cmd';
+  var statusTopic='bedbugs/'+sid+'/status';
   var mqtt=new TinyMQTT(BROKER,{clientId:'bb_rem_'+sid.substr(0,6),keepAlive:25,reconnect:true});
 
-  var sidEl=document.querySelector('.sid');
-  if(sidEl) sidEl.textContent=sid.substring(0,6);
+  document.getElementById('ft-sid').textContent=sid.substring(0,6);
 
   // Wire buttons
   var btns=document.querySelectorAll('[data-a]');
   for(var i=0;i<btns.length;i++){
     (function(b){
       b.addEventListener('click',function(){
+        if(b.classList.contains('disabled'))return;
         fireIR();
-        mqtt.publish(topic,JSON.stringify({a:b.getAttribute('data-a'),k:secret,t:Date.now()}));
+        mqtt.publish(cmdTopic,JSON.stringify({a:b.getAttribute('data-a'),k:secret,t:Date.now()}));
       });
     })(btns[i]);
   }
 
-  // Status
+  // Status + connection
   var badge=document.getElementById('status');
   mqtt.on('connect',function(){
     badge.className='badge ok';
     badge.innerHTML='<span class="bdot"></span><span>Connected</span>';
-    // Send pairing ping to extension
-    mqtt.publish(topic,JSON.stringify({a:'ping',k:secret,t:Date.now()}));
+    mqtt.subscribe(statusTopic);
+    mqtt.publish(cmdTopic,JSON.stringify({a:'ping',k:secret,t:Date.now()}));
   });
   mqtt.on('close',function(){
     badge.className='badge no';
     badge.innerHTML='<span class="bdot"></span><span>Reconnecting</span>';
+  });
+  mqtt.on('message',function(topic,msg){
+    if(topic===statusTopic){
+      var data;
+      try{data=JSON.parse(msg)}catch(e){return}
+      updateNowPlaying(data);
+    }
   });
   mqtt.connect();
 
