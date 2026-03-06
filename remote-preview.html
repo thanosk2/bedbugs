@@ -3,241 +3,363 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Bedbugs Remote Preview</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#1a1a1e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Bedbugs Remote</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
   :root{
-    --bg:#08080a;
-    --s1:#111114;
-    --s2:#19191e;
-    --b:#1e1e24;
-    --t:#dddde4;
-    --td:#48485a;
-    --red:#d93636;
-    --redg:rgba(217,54,54,.1);
-    --redb:rgba(217,54,54,.18);
-    --grn:#3fdc7f;
-    --grng:rgba(63,220,127,.08);
-    --grnb:rgba(63,220,127,.18);
-    --r:14px;
-    --glow:0 0 20px rgba(217,54,54,.08)
+    --shell:#1e1f23;
+    --btn-bg:#2a2b30;
+    --btn-bg-h:#323338;
+    --btn-shadow:0 2px 4px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04);
+    --btn-active:0 1px 2px rgba(0,0,0,.3), inset 0 1px 2px rgba(0,0,0,.2);
+    --t:#c8c9cf;
+    --t2:#6e7080;
+    --red:#e63946;
+    --red-dim:#c0313d;
+    --grn:#4ade80;
+    --ir:#ff2020;
   }
 
   html,body{
     height:100%;overflow:hidden;
-    background:var(--bg);
+    background:#111114;
+    font-family:'Outfit',sans-serif;
     color:var(--t);
-    font-family:'DM Mono',monospace;
+    touch-action:manipulation;
   }
 
-  /* Subtle noise texture */
-  body::before{
-    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.03;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size:200px 200px;
-  }
-
-  .phone-frame{
-    position:relative;z-index:1;
-    width:100%;max-width:390px;height:100vh;max-height:844px;
+  /* ── Remote shell ── */
+  .remote{
+    position:relative;
+    width:100%;max-width:320px;
     margin:0 auto;
+    min-height:100vh;
     display:flex;flex-direction:column;
-    padding:20px 16px;
-    padding-top:max(20px, env(safe-area-inset-top));
-    padding-bottom:max(20px, env(safe-area-inset-bottom));
+    align-items:center;
+    padding:24px 20px;
+    padding-top:max(24px, env(safe-area-inset-top));
+    padding-bottom:max(24px, env(safe-area-inset-bottom));
+    background:linear-gradient(180deg, #222228 0%, var(--shell) 8%, var(--shell) 92%, #1a1a1e 100%);
+    border-radius:36px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.03),
+      0 20px 60px rgba(0,0,0,.5),
+      inset 0 1px 0 rgba(255,255,255,.04);
   }
 
-  /* ── Header ── */
-  .hd{
-    display:flex;align-items:center;justify-content:space-between;
-    padding-bottom:14px;
-    border-bottom:1px solid var(--b);
-    margin-bottom:8px;flex-shrink:0;
+  /* Subtle texture */
+  .remote::before{
+    content:'';position:absolute;inset:0;border-radius:36px;
+    opacity:.015;pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg width='4' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='1' height='1' fill='white'/%3E%3C/svg%3E");
+    background-size:4px 4px;
   }
-  .hd-l{display:flex;align-items:center;gap:10px}
-  .logo{
-    width:32px;height:32px;
-    background:var(--redg);
-    border:1px solid rgba(217,54,54,.15);
-    border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:16px;
-  }
-  .brand{display:flex;flex-direction:column;gap:1px}
-  .brand-name{font-size:13px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--t)}
-  .brand-sub{font-size:9px;color:var(--td);letter-spacing:.5px;text-transform:uppercase}
 
+  /* ── IR LED ── */
+  .ir-area{
+    width:100%;display:flex;justify-content:center;
+    padding-bottom:20px;flex-shrink:0;
+  }
+  .ir-led{
+    width:16px;height:16px;border-radius:50%;
+    background:#1a1a1e;
+    border:1px solid #2a2a2e;
+    transition:background .06s,box-shadow .06s,border-color .06s;
+  }
+  .ir-led.on{
+    background:var(--ir);
+    box-shadow:0 0 8px 2px rgba(255,32,32,.4),0 0 20px 4px rgba(255,32,32,.15);
+    border-color:rgba(255,32,32,.3);
+  }
+
+  /* ── Status row ── */
+  .status-row{
+    width:100%;display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:20px;flex-shrink:0;
+  }
+  .brand{font-size:15px;font-weight:500;letter-spacing:.5px;color:var(--t)}
   .badge{
-    font-size:9px;padding:4px 10px;border-radius:20px;
-    display:flex;align-items:center;gap:5px;letter-spacing:.3px;
-    animation:fadeIn .4s ease .2s both;
+    font-size:10px;font-weight:400;padding:4px 10px;border-radius:16px;
+    display:flex;align-items:center;gap:5px;letter-spacing:.2px;
   }
-  .badge.ok{background:var(--grng);color:var(--grn);border:1px solid var(--grnb)}
-  .dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 2.5s ease infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .badge.ok{background:rgba(74,222,128,.07);color:var(--grn);border:1px solid rgba(74,222,128,.15)}
+  .badge.no{background:rgba(255,255,255,.03);color:var(--t2);border:1px solid rgba(255,255,255,.06)}
+  .bdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+  .badge.ok .bdot{animation:pulse 2.5s ease infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
 
   /* ── Controls ── */
-  .ctl{
-    flex:1;display:flex;flex-direction:column;
-    gap:8px;justify-content:center;
-    padding:4px 0;
+  .controls{
+    flex:1;width:100%;
+    display:flex;flex-direction:column;
+    gap:10px;justify-content:center;
   }
-  .row{display:flex;gap:8px}
-  .row .btn{flex:1}
+  .row{display:flex;gap:10px}
+  .row>.btn{flex:1}
 
   /* ── Button ── */
   .btn{
     position:relative;
-    display:flex;align-items:center;justify-content:center;gap:7px;
-    padding:15px 10px;
-    border:1px solid var(--b);border-radius:var(--r);
-    background:var(--s1);color:var(--t);
-    font-family:inherit;font-size:11px;font-weight:500;letter-spacing:.4px;
+    display:flex;align-items:center;justify-content:center;
+    gap:6px;
+    height:52px;
+    border:none;
+    border-radius:16px;
+    background:var(--btn-bg);
+    box-shadow:var(--btn-shadow);
+    color:var(--t);
+    font-family:inherit;font-size:12px;font-weight:400;letter-spacing:.2px;
     cursor:pointer;
-    transition:transform .07s ease, background .1s ease, border-color .1s ease, box-shadow .15s ease;
+    transition:transform .06s ease,background .08s ease,box-shadow .08s ease;
     user-select:none;-webkit-user-select:none;
-    overflow:hidden;
+    outline:none;
+    -webkit-appearance:none;
   }
-  .btn::after{
-    content:'';position:absolute;inset:0;
-    background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.04), transparent 70%);
-    opacity:0;transition:opacity .15s;
-  }
+
   .btn:active{
-    transform:scale(.955);
-    background:var(--s2);
+    transform:scale(.97) translateY(1px);
+    background:var(--btn-bg-h);
+    box-shadow:var(--btn-active);
   }
-  .btn:active::after{opacity:1}
 
-  .btn .ic{font-size:16px;line-height:1;filter:grayscale(.2)}
-  .btn .label{white-space:nowrap}
+  .btn .ic{font-size:15px;line-height:1}
 
-  /* Big play button */
+  /* Play/Pause — hero button */
   .btn--play{
-    height:76px;font-size:14px;letter-spacing:.8px;
-    border-color:#252530;
-    background:linear-gradient(180deg, #131318 0%, #0f0f14 100%);
+    height:68px;font-size:14px;font-weight:500;
+    border-radius:20px;
+    background:linear-gradient(180deg,#2e2f34 0%,#28292e 100%);
   }
   .btn--play:active{
-    background:linear-gradient(180deg, #1a1a22 0%, #141419 100%);
-    box-shadow:0 0 30px rgba(255,255,255,.02);
+    background:linear-gradient(180deg,#343540 0%,#2e2f36 100%);
   }
-  .btn--play .ic{font-size:20px}
+  .btn--play .ic{font-size:22px}
 
-  /* Accent (red) buttons */
+  /* Red accent */
   .btn--r{
-    background:var(--redg);
-    border-color:rgba(217,54,54,.15);
-    color:var(--red);
+    background:var(--red);
+    color:#fff;
+    box-shadow:0 2px 8px rgba(230,57,70,.25),inset 0 1px 0 rgba(255,255,255,.08);
   }
   .btn--r:active{
-    background:var(--redb);
-    box-shadow:var(--glow);
+    background:var(--red-dim);
+    box-shadow:0 1px 4px rgba(230,57,70,.2),inset 0 1px 2px rgba(0,0,0,.15);
   }
 
-  /* Staggered entrance */
-  .ctl .row:nth-child(1){animation:slideUp .35s ease .1s both}
-  .ctl .btn--play{animation:slideUp .35s ease .18s both}
-  .ctl .row:nth-child(3){animation:slideUp .35s ease .26s both}
-  .ctl .row:nth-child(4){animation:slideUp .35s ease .34s both}
-  .ctl .btn--r.btn--next{animation:slideUp .35s ease .42s both}
-  @keyframes slideUp{
-    from{opacity:0;transform:translateY(12px)}
-    to{opacity:1;transform:translateY(0)}
+  /* Smaller util row */
+  .btn--sm{height:46px;font-size:11px}
+
+  /* Divider */
+  .divider{
+    width:60px;height:1px;
+    background:rgba(255,255,255,.04);
+    margin:4px auto;
+    border-radius:1px;
   }
 
   /* ── Footer ── */
   .ft{
-    font-size:8px;color:var(--td);text-align:center;
-    letter-spacing:1px;text-transform:uppercase;
-    flex-shrink:0;padding-top:12px;
-    animation:fadeIn .4s ease .5s both;
+    font-size:9px;color:var(--t2);letter-spacing:.5px;
+    padding-top:16px;flex-shrink:0;opacity:.5;
   }
-  .ft .sid{color:#3a3a4a}
 
-  /* ── Active state flash ── */
-  .btn.flash{
-    background:rgba(255,255,255,.05) !important;
-    border-color:rgba(255,255,255,.1) !important;
-  }
+  /* ── Entrance ── */
+  .controls .row:nth-child(1){animation:rise .3s ease .05s both}
+  .controls .btn--play{animation:rise .3s ease .12s both}
+  .controls .row:nth-child(3){animation:rise .3s ease .19s both}
+  .controls .divider{animation:rise .3s ease .24s both}
+  .controls .row:nth-child(5){animation:rise .3s ease .28s both}
+  .controls .btn--r.full{animation:rise .3s ease .34s both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
-<div class="phone-frame">
 
-  <div class="hd">
-    <div class="hd-l">
-      <div class="logo">🐛</div>
-      <div class="brand">
-        <span class="brand-name">Bedbugs</span>
-        <span class="brand-sub">remote control</span>
-      </div>
-    </div>
-    <div class="badge ok">
-      <span class="dot"></span>
-      <span>Connected</span>
+<div class="remote">
+
+  <div class="ir-area">
+    <div class="ir-led" id="ir"></div>
+  </div>
+
+  <div class="status-row">
+    <span class="brand">Bedbugs</span>
+    <div class="badge no" id="status">
+      <span class="bdot"></span>
+      <span>Connecting</span>
     </div>
   </div>
 
-  <div class="ctl">
+  <div class="controls">
+
     <div class="row">
-      <button class="btn btn--r" onclick="flash(this)">
-        <span class="ic">⏭</span>
-        <span class="label">Skip Intro</span>
-      </button>
-      <button class="btn btn--r" onclick="flash(this)">
-        <span class="ic">⏭</span>
-        <span class="label">Skip Recap</span>
-      </button>
+      <button class="btn btn--r" data-a="skipIntro">Skip Intro</button>
+      <button class="btn btn--r" data-a="skipRecap">Skip Recap</button>
     </div>
 
-    <button class="btn btn--play" onclick="flash(this)">
-      <span class="ic">⏯</span>
-      <span class="label">Play / Pause</span>
+    <button class="btn btn--play" data-a="playPause">
+      <span class="ic">❚❚</span>
+      Play / Pause
     </button>
 
     <div class="row">
-      <button class="btn" onclick="flash(this)">
-        <span class="ic">⏪</span>
-        <span class="label">−10s</span>
+      <button class="btn" data-a="seekBack">
+        <span class="ic">↻</span> −10s
       </button>
-      <button class="btn" onclick="flash(this)">
-        <span class="ic">⏩</span>
-        <span class="label">+10s</span>
+      <button class="btn" data-a="seekForward">
+        <span class="ic">↺</span> +10s
       </button>
     </div>
+
+    <div class="divider"></div>
 
     <div class="row">
-      <button class="btn" onclick="flash(this)">
-        <span class="ic">🔇</span>
-        <span class="label">Mute</span>
+      <button class="btn btn--sm" data-a="mute">
+        <span class="ic">🔇</span> Mute
       </button>
-      <button class="btn" onclick="flash(this)">
-        <span class="ic">⛶</span>
-        <span class="label">Fullscreen</span>
+      <button class="btn btn--sm" data-a="fullscreen">
+        <span class="ic">⛶</span> Fullscreen
       </button>
     </div>
 
-    <button class="btn btn--r btn--next" onclick="flash(this)">
-      <span class="ic">⏭</span>
-      <span class="label">Next Episode</span>
-    </button>
+    <button class="btn btn--r full" data-a="nextEpisode">Next Episode →</button>
+
   </div>
 
   <div class="ft">
-    session <span class="sid">a7k2m9</span> · broker.hivemq.com
+    <span class="sid">------</span>
   </div>
 
 </div>
 
 <script>
-function flash(el) {
-  if (navigator.vibrate) navigator.vibrate(25);
-  el.classList.add('flash');
-  setTimeout(function(){ el.classList.remove('flash'); }, 120);
+// ============================================================
+// TinyMQTT — inlined
+// ============================================================
+var TinyMQTT=(function(){
+  var CONNECT=1,CONNACK=2,PUBLISH=3,SUBSCRIBE=8,PINGREQ=12;
+  function T(url,opts){
+    opts=opts||{};this._url=url;
+    this._cid=opts.clientId||'bb_'+Math.random().toString(36).substr(2,10);
+    this._ka=opts.keepAlive||25;this._ws=null;this._pt=null;this._pid=0;
+    this._h={message:null,connect:null,close:null};
+    this._rc=opts.reconnect!==false;this._dead=false;this._subs=[];
+  }
+  function s2b(s){var a=[];for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);
+    if(c<0x80)a.push(c);else if(c<0x800)a.push(0xC0|(c>>6),0x80|(c&0x3F));
+    else a.push(0xE0|(c>>12),0x80|((c>>6)&0x3F),0x80|(c&0x3F))}return a}
+  function b2s(a,s,e){var o='',i=s;while(i<e){var b=a[i];
+    if(b<0x80){o+=String.fromCharCode(b);i++}
+    else if((b&0xE0)===0xC0){o+=String.fromCharCode(((b&0x1F)<<6)|(a[i+1]&0x3F));i+=2}
+    else{o+=String.fromCharCode(((b&0x0F)<<12)|((a[i+1]&0x3F)<<6)|(a[i+2]&0x3F));i+=3}}return o}
+  function es(s){var b=s2b(s);return[(b.length>>8)&0xFF,b.length&0xFF].concat(b)}
+  function er(l){var o=[];do{var b=l&0x7F;l=l>>7;if(l>0)b=b|0x80;o.push(b)}while(l>0);return o}
+  function bCon(c,k){var v=[0,4,0x4D,0x51,0x54,0x54,4,2,(k>>8)&0xFF,k&0xFF];
+    var p=es(c);var r=v.length+p.length;return new Uint8Array([(CONNECT<<4)].concat(er(r),v,p))}
+  function bSub(id,t){var tb=es(t);var v=[(id>>8)&0xFF,id&0xFF];var p=tb.concat([0]);
+    var r=v.length+p.length;return new Uint8Array([(SUBSCRIBE<<4)|2].concat(er(r),v,p))}
+  function bPub(t,m){var tb=es(t);var mb=s2b(m);var r=tb.length+mb.length;
+    return new Uint8Array([(PUBLISH<<4)].concat(er(r),tb,mb))}
+  function bPing(){return new Uint8Array([(PINGREQ<<4),0])}
+  function dr(d,o){var mul=1,v=0,i=o,b;do{b=d[i++];v+=(b&0x7F)*mul;mul*=128}while(b&0x80);
+    return{length:v,next:i}}
+  function pPub(d){var rl=dr(d,1);var i=rl.next;var tl=(d[i]<<8)|d[i+1];i+=2;
+    var t=b2s(d,i,i+tl);i+=tl;var m=b2s(d,i,rl.next+rl.length);return{topic:t,message:m}}
+  T.prototype.connect=function(){var self=this;self._dead=false;
+    self._ws=new WebSocket(self._url,['mqtt']);self._ws.binaryType='arraybuffer';
+    self._ws.onopen=function(){self._ws.send(bCon(self._cid,self._ka))};
+    self._ws.onmessage=function(e){var d=new Uint8Array(e.data);if(!d.length)return;
+      var tp=(d[0]>>4)&0xF;
+      if(tp===CONNACK){self._startPing();
+        for(var i=0;i<self._subs.length;i++)self._doSub(self._subs[i]);
+        if(self._h.connect)self._h.connect()}
+      else if(tp===PUBLISH){var p=pPub(d);if(self._h.message)self._h.message(p.topic,p.message)}};
+    self._ws.onclose=function(){self._stopPing();if(self._h.close)self._h.close();
+      if(self._rc&&!self._dead)setTimeout(function(){self.connect()},2000)};
+    self._ws.onerror=function(){}};
+  T.prototype._doSub=function(t){if(!this._ws||this._ws.readyState!==1)return;
+    this._pid=(this._pid+1)&0xFFFF||1;this._ws.send(bSub(this._pid,t))};
+  T.prototype.subscribe=function(t){if(this._subs.indexOf(t)===-1)this._subs.push(t);this._doSub(t)};
+  T.prototype.publish=function(t,m){if(this._ws&&this._ws.readyState===1)this._ws.send(bPub(t,m))};
+  T.prototype.disconnect=function(){this._dead=true;this._stopPing();if(this._ws)this._ws.close()};
+  T.prototype._startPing=function(){var s=this;s._stopPing();
+    s._pt=setInterval(function(){if(s._ws&&s._ws.readyState===1)s._ws.send(bPing())},s._ka*1000)};
+  T.prototype._stopPing=function(){if(this._pt){clearInterval(this._pt);this._pt=null}};
+  T.prototype.on=function(e,f){this._h[e]=f};
+  return T;
+})();
+
+// ============================================================
+// Controller
+// ============================================================
+var BROKER='wss://broker.hivemq.com:8884/mqtt';
+var irLed=document.getElementById('ir');
+var irTimer=null;
+
+function getParams(){
+  var p={},s=location.search.substring(1),parts=s.split('&');
+  for(var i=0;i<parts.length;i++){var kv=parts[i].split('=');
+    p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]||'')}
+  return p;
+}
+
+var params=getParams();
+var sid=params.s;
+var secret=params.k;
+
+function fireIR(){
+  if(navigator.vibrate)navigator.vibrate(20);
+  irLed.classList.add('on');
+  clearTimeout(irTimer);
+  irTimer=setTimeout(function(){irLed.classList.remove('on')},180);
+}
+
+if(!sid||!secret){
+  var ctl=document.querySelector('.controls');
+  if(ctl){
+    ctl.innerHTML='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--t2);font-size:13px;text-align:center;line-height:1.6">'
+      +'<div style="font-size:28px;margin-bottom:4px">🐛</div>'
+      +'<div style="font-weight:500;color:var(--t)">No session</div>'
+      +'<div>Open the Bedbugs extension on<br>your desktop and scan the QR.</div></div>';
+  }
+} else {
+  var topic='bedbugs/'+sid+'/cmd';
+  var mqtt=new TinyMQTT(BROKER,{clientId:'bb_rem_'+sid.substr(0,6),keepAlive:25,reconnect:true});
+
+  var sidEl=document.querySelector('.sid');
+  if(sidEl) sidEl.textContent=sid.substring(0,6);
+
+  // Wire buttons
+  var btns=document.querySelectorAll('[data-a]');
+  for(var i=0;i<btns.length;i++){
+    (function(b){
+      b.addEventListener('click',function(){
+        fireIR();
+        mqtt.publish(topic,JSON.stringify({a:b.getAttribute('data-a'),k:secret,t:Date.now()}));
+      });
+    })(btns[i]);
+  }
+
+  // Status
+  var badge=document.getElementById('status');
+  mqtt.on('connect',function(){
+    badge.className='badge ok';
+    badge.innerHTML='<span class="bdot"></span><span>Connected</span>';
+    // Send pairing ping to extension
+    mqtt.publish(topic,JSON.stringify({a:'ping',k:secret,t:Date.now()}));
+  });
+  mqtt.on('close',function(){
+    badge.className='badge no';
+    badge.innerHTML='<span class="bdot"></span><span>Reconnecting</span>';
+  });
+  mqtt.connect();
+
+  document.body.addEventListener('touchmove',function(e){
+    if(e.target===document.body)e.preventDefault()
+  },{passive:false});
 }
 </script>
 </body>
