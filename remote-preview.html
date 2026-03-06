@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Bedbugs Remote Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+  :root{
+    --bg:#08080a;
+    --s1:#111114;
+    --s2:#19191e;
+    --b:#1e1e24;
+    --t:#dddde4;
+    --td:#48485a;
+    --red:#d93636;
+    --redg:rgba(217,54,54,.1);
+    --redb:rgba(217,54,54,.18);
+    --grn:#3fdc7f;
+    --grng:rgba(63,220,127,.08);
+    --grnb:rgba(63,220,127,.18);
+    --r:14px;
+    --glow:0 0 20px rgba(217,54,54,.08)
+  }
+
+  html,body{
+    height:100%;overflow:hidden;
+    background:var(--bg);
+    color:var(--t);
+    font-family:'DM Mono',monospace;
+  }
+
+  /* Subtle noise texture */
+  body::before{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.03;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size:200px 200px;
+  }
+
+  .phone-frame{
+    position:relative;z-index:1;
+    width:100%;max-width:390px;height:100vh;max-height:844px;
+    margin:0 auto;
+    display:flex;flex-direction:column;
+    padding:20px 16px;
+    padding-top:max(20px, env(safe-area-inset-top));
+    padding-bottom:max(20px, env(safe-area-inset-bottom));
+  }
+
+  /* ── Header ── */
+  .hd{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--b);
+    margin-bottom:8px;flex-shrink:0;
+  }
+  .hd-l{display:flex;align-items:center;gap:10px}
+  .logo{
+    width:32px;height:32px;
+    background:var(--redg);
+    border:1px solid rgba(217,54,54,.15);
+    border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;
+  }
+  .brand{display:flex;flex-direction:column;gap:1px}
+  .brand-name{font-size:13px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--t)}
+  .brand-sub{font-size:9px;color:var(--td);letter-spacing:.5px;text-transform:uppercase}
+
+  .badge{
+    font-size:9px;padding:4px 10px;border-radius:20px;
+    display:flex;align-items:center;gap:5px;letter-spacing:.3px;
+    animation:fadeIn .4s ease .2s both;
+  }
+  .badge.ok{background:var(--grng);color:var(--grn);border:1px solid var(--grnb)}
+  .dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:pulse 2.5s ease infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ── Controls ── */
+  .ctl{
+    flex:1;display:flex;flex-direction:column;
+    gap:8px;justify-content:center;
+    padding:4px 0;
+  }
+  .row{display:flex;gap:8px}
+  .row .btn{flex:1}
+
+  /* ── Button ── */
+  .btn{
+    position:relative;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    padding:15px 10px;
+    border:1px solid var(--b);border-radius:var(--r);
+    background:var(--s1);color:var(--t);
+    font-family:inherit;font-size:11px;font-weight:500;letter-spacing:.4px;
+    cursor:pointer;
+    transition:transform .07s ease, background .1s ease, border-color .1s ease, box-shadow .15s ease;
+    user-select:none;-webkit-user-select:none;
+    overflow:hidden;
+  }
+  .btn::after{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.04), transparent 70%);
+    opacity:0;transition:opacity .15s;
+  }
+  .btn:active{
+    transform:scale(.955);
+    background:var(--s2);
+  }
+  .btn:active::after{opacity:1}
+
+  .btn .ic{font-size:16px;line-height:1;filter:grayscale(.2)}
+  .btn .label{white-space:nowrap}
+
+  /* Big play button */
+  .btn--play{
+    height:76px;font-size:14px;letter-spacing:.8px;
+    border-color:#252530;
+    background:linear-gradient(180deg, #131318 0%, #0f0f14 100%);
+  }
+  .btn--play:active{
+    background:linear-gradient(180deg, #1a1a22 0%, #141419 100%);
+    box-shadow:0 0 30px rgba(255,255,255,.02);
+  }
+  .btn--play .ic{font-size:20px}
+
+  /* Accent (red) buttons */
+  .btn--r{
+    background:var(--redg);
+    border-color:rgba(217,54,54,.15);
+    color:var(--red);
+  }
+  .btn--r:active{
+    background:var(--redb);
+    box-shadow:var(--glow);
+  }
+
+  /* Staggered entrance */
+  .ctl .row:nth-child(1){animation:slideUp .35s ease .1s both}
+  .ctl .btn--play{animation:slideUp .35s ease .18s both}
+  .ctl .row:nth-child(3){animation:slideUp .35s ease .26s both}
+  .ctl .row:nth-child(4){animation:slideUp .35s ease .34s both}
+  .ctl .btn--r.btn--next{animation:slideUp .35s ease .42s both}
+  @keyframes slideUp{
+    from{opacity:0;transform:translateY(12px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+
+  /* ── Footer ── */
+  .ft{
+    font-size:8px;color:var(--td);text-align:center;
+    letter-spacing:1px;text-transform:uppercase;
+    flex-shrink:0;padding-top:12px;
+    animation:fadeIn .4s ease .5s both;
+  }
+  .ft .sid{color:#3a3a4a}
+
+  /* ── Active state flash ── */
+  .btn.flash{
+    background:rgba(255,255,255,.05) !important;
+    border-color:rgba(255,255,255,.1) !important;
+  }
+</style>
+</head>
+<body>
+<div class="phone-frame">
+
+  <div class="hd">
+    <div class="hd-l">
+      <div class="logo">🐛</div>
+      <div class="brand">
+        <span class="brand-name">Bedbugs</span>
+        <span class="brand-sub">remote control</span>
+      </div>
+    </div>
+    <div class="badge ok">
+      <span class="dot"></span>
+      <span>Connected</span>
+    </div>
+  </div>
+
+  <div class="ctl">
+    <div class="row">
+      <button class="btn btn--r" onclick="flash(this)">
+        <span class="ic">⏭</span>
+        <span class="label">Skip Intro</span>
+      </button>
+      <button class="btn btn--r" onclick="flash(this)">
+        <span class="ic">⏭</span>
+        <span class="label">Skip Recap</span>
+      </button>
+    </div>
+
+    <button class="btn btn--play" onclick="flash(this)">
+      <span class="ic">⏯</span>
+      <span class="label">Play / Pause</span>
+    </button>
+
+    <div class="row">
+      <button class="btn" onclick="flash(this)">
+        <span class="ic">⏪</span>
+        <span class="label">−10s</span>
+      </button>
+      <button class="btn" onclick="flash(this)">
+        <span class="ic">⏩</span>
+        <span class="label">+10s</span>
+      </button>
+    </div>
+
+    <div class="row">
+      <button class="btn" onclick="flash(this)">
+        <span class="ic">🔇</span>
+        <span class="label">Mute</span>
+      </button>
+      <button class="btn" onclick="flash(this)">
+        <span class="ic">⛶</span>
+        <span class="label">Fullscreen</span>
+      </button>
+    </div>
+
+    <button class="btn btn--r btn--next" onclick="flash(this)">
+      <span class="ic">⏭</span>
+      <span class="label">Next Episode</span>
+    </button>
+  </div>
+
+  <div class="ft">
+    session <span class="sid">a7k2m9</span> · broker.hivemq.com
+  </div>
+
+</div>
+
+<script>
+function flash(el) {
+  if (navigator.vibrate) navigator.vibrate(25);
+  el.classList.add('flash');
+  setTimeout(function(){ el.classList.remove('flash'); }, 120);
+}
+</script>
+</body>
+</html>
