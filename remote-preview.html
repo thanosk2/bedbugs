@@ -3,293 +3,243 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#111114">
+<meta name="theme-color" content="#141417">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Bedbugs Remote</title>
+<title>Bedbugs</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
   :root{
-    --bg:#111114;
-    --shell:#1a1b1f;
-    --btn-bg:#252630;
-    --btn-bg-h:#2e2f3a;
-    --btn-shadow:0 2px 4px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03);
-    --btn-active:0 1px 2px rgba(0,0,0,.3),inset 0 1px 2px rgba(0,0,0,.2);
-    --t:#c8c9cf;--t2:#6e7080;--t3:#3a3b48;
-    --red:#e63946;--red-dim:#c0313d;
+    --bg:#141417;
+    --btn:#222228;--btn-h:#2a2a32;
+    --btn-sh:0 3px 6px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03);
+    --btn-act:0 1px 2px rgba(0,0,0,.3),inset 0 2px 3px rgba(0,0,0,.25);
+    --t:#bbbcc5;--t2:#55566a;--t3:#333345;
+    --red:#e63946;--red-d:#b82d38;
     --grn:#4ade80;--ir:#ff2020;
-    --r:14px
+    --r:16px
   }
 
   html,body{
-    height:100%;overflow:hidden;
-    background:var(--bg);
-    font-family:'Outfit',sans-serif;
-    color:var(--t);
+    height:100%;overflow:hidden;background:var(--bg);
+    font-family:'Outfit',sans-serif;color:var(--t);
     touch-action:manipulation;
   }
 
   .app{
-    display:flex;flex-direction:column;
-    height:100%;width:100%;
-    padding:16px;
-    padding-top:max(16px, env(safe-area-inset-top));
-    padding-bottom:max(16px, env(safe-area-inset-bottom));
+    display:flex;flex-direction:column;height:100%;width:100%;
+    padding:14px 16px;
+    padding-top:max(14px,env(safe-area-inset-top));
+    padding-bottom:max(14px,env(safe-area-inset-bottom));
   }
 
-  /* ── IR LED ── */
-  .ir-area{display:flex;justify-content:center;padding-bottom:14px;flex-shrink:0}
+  /* IR */
+  .ir-row{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;flex-shrink:0}
   .ir-led{
-    width:16px;height:16px;border-radius:50%;
-    background:#1a1a1e;border:1px solid #2a2a2e;
-    transition:background .06s,box-shadow .06s,border-color .06s;
+    width:14px;height:14px;border-radius:50%;
+    background:#1c1c22;border:1px solid #2a2a30;
+    transition:background .05s,box-shadow .05s;
   }
   .ir-led.on{
     background:var(--ir);
-    box-shadow:0 0 8px 2px rgba(255,32,32,.4),0 0 20px 4px rgba(255,32,32,.15);
-    border-color:rgba(255,32,32,.3);
+    box-shadow:0 0 6px 2px rgba(255,32,32,.35),0 0 16px rgba(255,32,32,.12);
   }
-
-  /* ── Header ── */
-  .hd{
-    display:flex;align-items:center;justify-content:space-between;
-    padding-bottom:12px;border-bottom:1px solid #1e1f26;
-    flex-shrink:0;
-  }
-  .brand{font-size:15px;font-weight:500;letter-spacing:.5px}
   .badge{
-    font-size:9px;font-weight:500;padding:3px 9px;border-radius:14px;
+    font-size:9px;font-weight:400;padding:3px 8px;border-radius:12px;
     display:flex;align-items:center;gap:4px;letter-spacing:.2px;
   }
-  .badge.ok{background:rgba(74,222,128,.07);color:var(--grn);border:1px solid rgba(74,222,128,.15)}
-  .badge.no{background:rgba(255,255,255,.03);color:var(--t2);border:1px solid rgba(255,255,255,.06)}
-  .bdot{width:5px;height:5px;border-radius:50%;background:currentColor}
-  .badge.ok .bdot{animation:pulse 2.5s ease infinite}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+  .badge.ok{background:rgba(74,222,128,.06);color:var(--grn);border:1px solid rgba(74,222,128,.12)}
+  .badge.no{background:rgba(255,255,255,.03);color:var(--t2);border:1px solid rgba(255,255,255,.05)}
+  .bdot{width:4px;height:4px;border-radius:50%;background:currentColor}
+  .badge.ok .bdot{animation:p 2.5s ease infinite}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.2}}
 
-  /* ── Now Playing card ── */
-  .now-playing{
-    margin-top:14px;
-    padding:14px 16px;
-    background:var(--shell);
-    border-radius:12px;
-    border:1px solid #222230;
-    flex-shrink:0;
-    transition:opacity .3s;
+  /* Now playing */
+  .np{
+    padding:10px 14px;background:#1a1a20;border-radius:10px;border:1px solid #222230;
+    margin-bottom:12px;flex-shrink:0;min-height:42px;
+    display:flex;align-items:center;gap:10px;
   }
-  .np-idle{text-align:center;color:var(--t2);font-size:12px;padding:8px 0}
-  .np-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:6px}
-  .np-title{font-size:15px;font-weight:500;color:#fff;margin-bottom:2px}
-  .np-episode{font-size:11px;color:var(--t2);font-weight:400}
-  .np-site{
-    display:inline-block;font-size:9px;font-weight:500;
-    padding:2px 7px;border-radius:6px;margin-top:8px;
-    background:rgba(255,255,255,.04);color:var(--t2);
-    letter-spacing:.3px;text-transform:uppercase;
+  .np-dot{
+    width:8px;height:8px;border-radius:50%;flex-shrink:0;
+    background:var(--t3);
   }
+  .np-dot.live{background:var(--red);box-shadow:0 0 6px rgba(230,57,70,.4)}
+  .np-text{font-size:11px;color:var(--t2);flex:1;min-width:0}
+  .np-title{color:var(--t);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .np-sub{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 
-  /* ── Controls ── */
+  /* Controls */
   .ctl{
-    flex:1;display:flex;flex-direction:column;
-    gap:8px;justify-content:center;
-    padding:14px 0;
+    flex:1;display:flex;flex-direction:column;gap:8px;justify-content:center;
   }
   .row{display:flex;gap:8px}
-  .row>.btn{flex:1}
 
-  /* ── Button ── */
-  .btn{
+  /* Button */
+  .b{
     display:flex;align-items:center;justify-content:center;
-    gap:6px;height:52px;
+    flex:1;height:58px;
     border:none;border-radius:var(--r);
-    background:var(--btn-bg);box-shadow:var(--btn-shadow);
-    color:var(--t);font-family:inherit;font-size:12px;font-weight:400;letter-spacing:.2px;
+    background:var(--btn);box-shadow:var(--btn-sh);
+    color:var(--t);font-family:inherit;font-size:22px;line-height:1;
     cursor:pointer;
-    transition:transform .06s,background .08s,box-shadow .08s,opacity .3s;
+    transition:transform .05s,background .06s,box-shadow .06s;
     user-select:none;-webkit-user-select:none;
     outline:none;-webkit-appearance:none;
   }
-  .btn:active{transform:scale(.97) translateY(1px);background:var(--btn-bg-h);box-shadow:var(--btn-active)}
-  .btn .ic{font-size:15px;line-height:1}
+  .b:active{transform:scale(.96) translateY(1px);background:var(--btn-h);box-shadow:var(--btn-act)}
+  .b.disabled{opacity:.15;pointer-events:none}
 
-  /* Play/Pause hero */
-  .btn--play{
-    height:68px;font-size:14px;font-weight:500;border-radius:18px;
-    background:linear-gradient(180deg,#2a2b32 0%,#242530 100%);
+  /* Play — large center */
+  .b--play{
+    height:72px;border-radius:20px;font-size:28px;
+    background:linear-gradient(180deg,#282830 0%,#222228 100%);
   }
-  .btn--play:active{background:linear-gradient(180deg,#32333c 0%,#2c2d38 100%)}
-  .btn--play .ic{font-size:22px}
+  .b--play:active{background:linear-gradient(180deg,#30303a 0%,#2a2a32 100%)}
 
   /* Red accent */
-  .btn--r{
+  .b--r{
     background:var(--red);color:#fff;
-    box-shadow:0 2px 8px rgba(230,57,70,.25),inset 0 1px 0 rgba(255,255,255,.08);
+    box-shadow:0 3px 10px rgba(230,57,70,.2),inset 0 1px 0 rgba(255,255,255,.06);
   }
-  .btn--r:active{background:var(--red-dim);box-shadow:0 1px 4px rgba(230,57,70,.2),inset 0 1px 2px rgba(0,0,0,.15)}
+  .b--r:active{background:var(--red-d);box-shadow:0 1px 4px rgba(230,57,70,.15),inset 0 1px 2px rgba(0,0,0,.2)}
+  .b--r.disabled{opacity:.15;pointer-events:none}
 
-  /* Disabled state */
-  .btn.disabled{opacity:.25;pointer-events:none}
+  /* Small label under icon */
+  .b .sub{font-size:9px;font-weight:400;letter-spacing:.3px;color:var(--t2);margin-top:2px}
+  .b--r .sub{color:rgba(255,255,255,.55)}
+  .b-col{flex-direction:column;gap:2px}
 
-  /* Small util */
-  .btn--sm{height:46px;font-size:11px}
+  /* Hidden */
+  .hidden{display:none!important}
 
-  .divider{width:60px;height:1px;background:rgba(255,255,255,.04);margin:2px auto;border-radius:1px}
+  /* Footer */
+  .ft{font-size:8px;color:var(--t3);text-align:center;padding-top:8px;flex-shrink:0;letter-spacing:.3px}
 
-  /* ── Footer ── */
-  .ft{font-size:8px;color:var(--t3);text-align:center;letter-spacing:.5px;padding-top:8px;flex-shrink:0}
-
-  /* ── Entrance ── */
-  .ctl .row:nth-child(1){animation:rise .3s ease .05s both}
-  .ctl .btn--play{animation:rise .3s ease .1s both}
-  .ctl .row:nth-child(3){animation:rise .3s ease .15s both}
-  .ctl .divider{animation:rise .3s ease .2s both}
-  .ctl .row:nth-child(5){animation:rise .3s ease .25s both}
-  .ctl .btn--r.full{animation:rise .3s ease .3s both}
-  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-  /* ── Error screen ── */
-  .err{
-    flex:1;display:flex;flex-direction:column;
-    align-items:center;justify-content:center;
-    gap:10px;color:var(--t2);font-size:13px;text-align:center;line-height:1.6;
-  }
+  /* Error */
+  .err{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--t2);font-size:13px;text-align:center;line-height:1.6}
 </style>
 </head>
 <body>
-
 <div class="app" id="app">
 
-  <div class="ir-area"><div class="ir-led" id="ir"></div></div>
-
-  <div class="hd">
-    <span class="brand">Bedbugs</span>
-    <div class="badge no" id="status">
-      <span class="bdot"></span>
-      <span>Connecting</span>
-    </div>
+  <div class="ir-row">
+    <div class="ir-led" id="ir"></div>
+    <div class="badge no" id="status"><span class="bdot"></span><span>Connecting</span></div>
   </div>
 
-  <div class="now-playing" id="np">
-    <div class="np-idle" id="np-idle">Start watching something!</div>
-    <div id="np-info" style="display:none">
-      <div class="np-label">Now Playing</div>
-      <div class="np-title" id="np-title"></div>
-      <div class="np-episode" id="np-ep"></div>
-      <div class="np-site" id="np-site"></div>
+  <div class="np" id="np">
+    <div class="np-dot" id="np-dot"></div>
+    <div class="np-text">
+      <div class="np-title" id="np-title">Start watching something</div>
+      <div class="np-sub" id="np-sub"></div>
     </div>
   </div>
 
   <div class="ctl">
-    <div class="row">
-      <button class="btn btn--r disabled" data-a="skipIntro" id="btn-skip">Skip</button>
+
+    <!-- Skip (full width, hidden when unavailable) -->
+    <div class="row" id="row-skip">
+      <button class="b b--r disabled" data-a="skipIntro" id="btn-skip">
+        <div class="b-col" style="display:flex;flex-direction:column;align-items:center">
+          <span>⏭</span><span class="sub">SKIP</span>
+        </div>
+      </button>
     </div>
 
-    <button class="btn btn--play" data-a="playPause" id="btn-pp">
-      <span class="ic">❚❚</span> Play / Pause
-    </button>
-
+    <!-- Play / Pause (big center) -->
     <div class="row">
-      <button class="btn" data-a="seekBack"><span class="ic">↻</span> −10s</button>
-      <button class="btn" data-a="seekForward"><span class="ic">↺</span> +10s</button>
+      <button class="b b--play" data-a="playPause" id="btn-pp">▶❚❚</button>
     </div>
 
-    <div class="divider"></div>
-
+    <!-- Seek back / forward -->
     <div class="row">
-      <button class="btn btn--sm" data-a="mute"><span class="ic">🔇</span> Mute</button>
-      <button class="btn btn--sm" data-a="fullscreen"><span class="ic">⛶</span> Fullscreen</button>
+      <button class="b" data-a="seekBack">
+        <div class="b-col" style="display:flex;flex-direction:column;align-items:center">
+          <span>↺</span><span class="sub">10s</span>
+        </div>
+      </button>
+      <button class="b" data-a="seekForward">
+        <div class="b-col" style="display:flex;flex-direction:column;align-items:center">
+          <span>↻</span><span class="sub">10s</span>
+        </div>
+      </button>
     </div>
 
-    <button class="btn btn--r full" data-a="nextEpisode">Next Episode →</button>
+    <!-- Volume / Mute / Fullscreen -->
+    <div class="row">
+      <button class="b" data-a="volumeDown" style="font-size:18px">🔉</button>
+      <button class="b" data-a="mute" style="font-size:18px">🔇</button>
+      <button class="b" data-a="volumeUp" style="font-size:18px">🔊</button>
+    </div>
+
+    <!-- Fullscreen -->
+    <div class="row">
+      <button class="b" data-a="fullscreen">
+        <div class="b-col" style="display:flex;flex-direction:column;align-items:center">
+          <span>⛶</span><span class="sub">Fullscreen</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- Next Episode (hidden for HBO) -->
+    <div class="row" id="row-next">
+      <button class="b b--r" data-a="nextEpisode">
+        <div class="b-col" style="display:flex;flex-direction:column;align-items:center">
+          <span>⏭</span><span class="sub">Next Episode</span>
+        </div>
+      </button>
+    </div>
+
   </div>
 
-  <div class="ft" id="ft">
-    <span id="ft-sid">------</span>
-  </div>
+  <div class="ft"><span id="ft-sid">------</span></div>
 
 </div>
 
 <script>
-// ============================================================
-// TinyMQTT — inlined
-// ============================================================
+// TinyMQTT inlined
 var TinyMQTT=(function(){
   var CONNECT=1,CONNACK=2,PUBLISH=3,SUBSCRIBE=8,PINGREQ=12;
-  function T(url,opts){
-    opts=opts||{};this._url=url;
-    this._cid=opts.clientId||'bb_'+Math.random().toString(36).substr(2,10);
-    this._ka=opts.keepAlive||25;this._ws=null;this._pt=null;this._pid=0;
-    this._h={message:null,connect:null,close:null};
-    this._rc=opts.reconnect!==false;this._dead=false;this._subs=[];
-  }
-  function s2b(s){var a=[];for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);
-    if(c<0x80)a.push(c);else if(c<0x800)a.push(0xC0|(c>>6),0x80|(c&0x3F));
-    else a.push(0xE0|(c>>12),0x80|((c>>6)&0x3F),0x80|(c&0x3F))}return a}
-  function b2s(a,s,e){var o='',i=s;while(i<e){var b=a[i];
-    if(b<0x80){o+=String.fromCharCode(b);i++}
-    else if((b&0xE0)===0xC0){o+=String.fromCharCode(((b&0x1F)<<6)|(a[i+1]&0x3F));i+=2}
-    else{o+=String.fromCharCode(((b&0x0F)<<12)|((a[i+1]&0x3F)<<6)|(a[i+2]&0x3F));i+=3}}return o}
+  function T(u,o){o=o||{};this._url=u;this._cid=o.clientId||'bb_'+Math.random().toString(36).substr(2,10);this._ka=o.keepAlive||25;this._ws=null;this._pt=null;this._pid=0;this._h={message:null,connect:null,close:null};this._rc=o.reconnect!==false;this._dead=false;this._subs=[]}
+  function s2b(s){var a=[];for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);if(c<0x80)a.push(c);else if(c<0x800)a.push(0xC0|(c>>6),0x80|(c&0x3F));else a.push(0xE0|(c>>12),0x80|((c>>6)&0x3F),0x80|(c&0x3F))}return a}
+  function b2s(a,s,e){var o='',i=s;while(i<e){var b=a[i];if(b<0x80){o+=String.fromCharCode(b);i++}else if((b&0xE0)===0xC0){o+=String.fromCharCode(((b&0x1F)<<6)|(a[i+1]&0x3F));i+=2}else{o+=String.fromCharCode(((b&0x0F)<<12)|((a[i+1]&0x3F)<<6)|(a[i+2]&0x3F));i+=3}}return o}
   function es(s){var b=s2b(s);return[(b.length>>8)&0xFF,b.length&0xFF].concat(b)}
   function er(l){var o=[];do{var b=l&0x7F;l=l>>7;if(l>0)b=b|0x80;o.push(b)}while(l>0);return o}
-  function bCon(c,k){var v=[0,4,0x4D,0x51,0x54,0x54,4,2,(k>>8)&0xFF,k&0xFF];
-    var p=es(c);var r=v.length+p.length;return new Uint8Array([(CONNECT<<4)].concat(er(r),v,p))}
-  function bSub(id,t){var tb=es(t);var v=[(id>>8)&0xFF,id&0xFF];var p=tb.concat([0]);
-    var r=v.length+p.length;return new Uint8Array([(SUBSCRIBE<<4)|2].concat(er(r),v,p))}
-  function bPub(t,m){var tb=es(t);var mb=s2b(m);var r=tb.length+mb.length;
-    return new Uint8Array([(PUBLISH<<4)].concat(er(r),tb,mb))}
-  function bPing(){return new Uint8Array([(PINGREQ<<4),0])}
-  function dr(d,o){var mul=1,v=0,i=o,b;do{b=d[i++];v+=(b&0x7F)*mul;mul*=128}while(b&0x80);
-    return{length:v,next:i}}
-  function pPub(d){var rl=dr(d,1);var i=rl.next;var tl=(d[i]<<8)|d[i+1];i+=2;
-    var t=b2s(d,i,i+tl);i+=tl;var m=b2s(d,i,rl.next+rl.length);return{topic:t,message:m}}
-  T.prototype.connect=function(){var self=this;self._dead=false;
-    self._ws=new WebSocket(self._url,['mqtt']);self._ws.binaryType='arraybuffer';
-    self._ws.onopen=function(){self._ws.send(bCon(self._cid,self._ka))};
-    self._ws.onmessage=function(e){var d=new Uint8Array(e.data);if(!d.length)return;
-      var tp=(d[0]>>4)&0xF;
-      if(tp===CONNACK){self._startPing();
-        for(var i=0;i<self._subs.length;i++)self._doSub(self._subs[i]);
-        if(self._h.connect)self._h.connect()}
-      else if(tp===PUBLISH){var p=pPub(d);if(self._h.message)self._h.message(p.topic,p.message)}};
-    self._ws.onclose=function(){self._stopPing();if(self._h.close)self._h.close();
-      if(self._rc&&!self._dead)setTimeout(function(){self.connect()},2000)};
-    self._ws.onerror=function(){}};
-  T.prototype._doSub=function(t){if(!this._ws||this._ws.readyState!==1)return;
-    this._pid=(this._pid+1)&0xFFFF||1;this._ws.send(bSub(this._pid,t))};
+  function bC(c,k){var v=[0,4,0x4D,0x51,0x54,0x54,4,2,(k>>8)&0xFF,k&0xFF];var p=es(c);var r=v.length+p.length;return new Uint8Array([(CONNECT<<4)].concat(er(r),v,p))}
+  function bS(id,t){var tb=es(t);var v=[(id>>8)&0xFF,id&0xFF];var p=tb.concat([0]);var r=v.length+p.length;return new Uint8Array([(SUBSCRIBE<<4)|2].concat(er(r),v,p))}
+  function bP(t,m){var tb=es(t);var mb=s2b(m);var r=tb.length+mb.length;return new Uint8Array([(PUBLISH<<4)].concat(er(r),tb,mb))}
+  function bPi(){return new Uint8Array([(PINGREQ<<4),0])}
+  function dr(d,o){var mul=1,v=0,i=o,b;do{b=d[i++];v+=(b&0x7F)*mul;mul*=128}while(b&0x80);return{length:v,next:i}}
+  function pP(d){var rl=dr(d,1);var i=rl.next;var tl=(d[i]<<8)|d[i+1];i+=2;var t=b2s(d,i,i+tl);i+=tl;var m=b2s(d,i,rl.next+rl.length);return{topic:t,message:m}}
+  T.prototype.connect=function(){var self=this;self._dead=false;self._ws=new WebSocket(self._url,['mqtt']);self._ws.binaryType='arraybuffer';self._ws.onopen=function(){self._ws.send(bC(self._cid,self._ka))};self._ws.onmessage=function(e){var d=new Uint8Array(e.data);if(!d.length)return;var tp=(d[0]>>4)&0xF;if(tp===CONNACK){self._startPing();for(var i=0;i<self._subs.length;i++)self._doSub(self._subs[i]);if(self._h.connect)self._h.connect()}else if(tp===PUBLISH){var p=pP(d);if(self._h.message)self._h.message(p.topic,p.message)}};self._ws.onclose=function(){self._stopPing();if(self._h.close)self._h.close();if(self._rc&&!self._dead)setTimeout(function(){self.connect()},2000)};self._ws.onerror=function(){}};
+  T.prototype._doSub=function(t){if(!this._ws||this._ws.readyState!==1)return;this._pid=(this._pid+1)&0xFFFF||1;this._ws.send(bS(this._pid,t))};
   T.prototype.subscribe=function(t){if(this._subs.indexOf(t)===-1)this._subs.push(t);this._doSub(t)};
-  T.prototype.publish=function(t,m){if(this._ws&&this._ws.readyState===1)this._ws.send(bPub(t,m))};
+  T.prototype.publish=function(t,m){if(this._ws&&this._ws.readyState===1)this._ws.send(bP(t,m))};
   T.prototype.disconnect=function(){this._dead=true;this._stopPing();if(this._ws)this._ws.close()};
-  T.prototype._startPing=function(){var s=this;s._stopPing();
-    s._pt=setInterval(function(){if(s._ws&&s._ws.readyState===1)s._ws.send(bPing())},s._ka*1000)};
+  T.prototype._startPing=function(){var s=this;s._stopPing();s._pt=setInterval(function(){if(s._ws&&s._ws.readyState===1)s._ws.send(bPi())},s._ka*1000)};
   T.prototype._stopPing=function(){if(this._pt){clearInterval(this._pt);this._pt=null}};
   T.prototype.on=function(e,f){this._h[e]=f};
   return T;
 })();
 
-// ============================================================
 // Controller
-// ============================================================
 var BROKER='wss://broker.hivemq.com:8884/mqtt';
 var irLed=document.getElementById('ir');
 var irTimer=null;
 var btnSkip=document.getElementById('btn-skip');
-var npIdle=document.getElementById('np-idle');
-var npInfo=document.getElementById('np-info');
+var rowNext=document.getElementById('row-next');
+var npDot=document.getElementById('np-dot');
 var npTitle=document.getElementById('np-title');
-var npEp=document.getElementById('np-ep');
-var npSite=document.getElementById('np-site');
-
-var SITE_LABELS={hbo:'HBO Max',max:'Max',netflix:'Netflix'};
+var npSub=document.getElementById('np-sub');
+var LABELS={hbo:'HBO Max',max:'Max',netflix:'Netflix'};
 
 function getParams(){
   var p={},s=location.search.substring(1),parts=s.split('&');
-  for(var i=0;i<parts.length;i++){var kv=parts[i].split('=');
-    p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]||'')}
+  for(var i=0;i<parts.length;i++){var kv=parts[i].split('=');p[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]||'')}
   return p;
 }
-
 var params=getParams();
 var sid=params.s;
 var secret=params.k;
@@ -298,52 +248,47 @@ function fireIR(){
   if(navigator.vibrate)navigator.vibrate(20);
   irLed.classList.add('on');
   clearTimeout(irTimer);
-  irTimer=setTimeout(function(){irLed.classList.remove('on')},180);
+  irTimer=setTimeout(function(){irLed.classList.remove('on')},160);
 }
 
-function updateNowPlaying(data){
-  if(!data || data.state==='idle' || !data.hasVideo){
-    npIdle.style.display='';
-    npInfo.style.display='none';
-    npIdle.textContent='Start watching something!';
+function updateStatus(d){
+  if(!d||d.state==='idle'||!d.hasVideo){
+    npDot.className='np-dot';
+    npTitle.textContent='Start watching something';
+    npSub.textContent='';
     btnSkip.classList.add('disabled');
+    rowNext.classList.add('hidden');
     return;
   }
+  npDot.className='np-dot'+(d.playing?' live':'');
+  npTitle.textContent=d.title||(LABELS[d.site]||'');
 
-  npIdle.style.display='none';
-  npInfo.style.display='';
+  var parts=[];
+  if(d.episode)parts.push(d.episode);
+  if(d.episodeName)parts.push(d.episodeName);
+  var label=LABELS[d.site]||'';
+  if(label&&parts.length)npSub.textContent=label+' · '+parts.join(' · ');
+  else if(label)npSub.textContent=label;
+  else npSub.textContent=parts.join(' · ');
 
-  npTitle.textContent=data.title||'Unknown';
+  // Skip
+  if(d.skipAvailable){btnSkip.classList.remove('disabled')}
+  else{btnSkip.classList.add('disabled')}
 
-  var epParts=[];
-  if(data.episode) epParts.push(data.episode);
-  if(data.episodeName) epParts.push(data.episodeName);
-  npEp.textContent=epParts.join(' · ')||'';
-
-  npSite.textContent=SITE_LABELS[data.site]||data.site||'';
-  npSite.style.display=data.site?'':'none';
-
-  // Skip button
-  if(data.skipAvailable){
-    btnSkip.classList.remove('disabled');
-  } else {
-    btnSkip.classList.add('disabled');
-  }
+  // Next episode (hide for HBO/Max)
+  if(d.hasNextEpisode){rowNext.classList.remove('hidden')}
+  else{rowNext.classList.add('hidden')}
 }
 
 if(!sid||!secret){
-  var app=document.getElementById('app');
-  app.innerHTML='<div class="err"><div style="font-size:28px;margin-bottom:4px">🐛</div>'
-    +'<div style="font-weight:500;color:var(--t)">No session</div>'
-    +'<div>Open the Bedbugs extension on your<br>desktop and scan the QR.</div></div>';
+  document.getElementById('app').innerHTML='<div class="err"><div style="font-size:28px">🐛</div><div style="font-weight:500;color:var(--t)">No session</div><div>Open Bedbugs extension and scan the QR.</div></div>';
 } else {
   var cmdTopic='bedbugs/'+sid+'/cmd';
-  var statusTopic='bedbugs/'+sid+'/status';
-  var mqtt=new TinyMQTT(BROKER,{clientId:'bb_rem_'+sid.substr(0,6),keepAlive:25,reconnect:true});
+  var stTopic='bedbugs/'+sid+'/status';
+  var mqtt=new TinyMQTT(BROKER,{clientId:'bb_r_'+sid.substr(0,6),keepAlive:25,reconnect:true});
 
   document.getElementById('ft-sid').textContent=sid.substring(0,6);
 
-  // Wire buttons
   var btns=document.querySelectorAll('[data-a]');
   for(var i=0;i<btns.length;i++){
     (function(b){
@@ -355,30 +300,21 @@ if(!sid||!secret){
     })(btns[i]);
   }
 
-  // Status + connection
   var badge=document.getElementById('status');
   mqtt.on('connect',function(){
-    badge.className='badge ok';
-    badge.innerHTML='<span class="bdot"></span><span>Connected</span>';
-    mqtt.subscribe(statusTopic);
+    badge.className='badge ok';badge.innerHTML='<span class="bdot"></span><span>Connected</span>';
+    mqtt.subscribe(stTopic);
     mqtt.publish(cmdTopic,JSON.stringify({a:'ping',k:secret,t:Date.now()}));
   });
   mqtt.on('close',function(){
-    badge.className='badge no';
-    badge.innerHTML='<span class="bdot"></span><span>Reconnecting</span>';
+    badge.className='badge no';badge.innerHTML='<span class="bdot"></span><span>Reconnecting</span>';
   });
   mqtt.on('message',function(topic,msg){
-    if(topic===statusTopic){
-      var data;
-      try{data=JSON.parse(msg)}catch(e){return}
-      updateNowPlaying(data);
-    }
+    if(topic===stTopic){try{updateStatus(JSON.parse(msg))}catch(e){}}
   });
   mqtt.connect();
 
-  document.body.addEventListener('touchmove',function(e){
-    if(e.target===document.body)e.preventDefault()
-  },{passive:false});
+  document.body.addEventListener('touchmove',function(e){if(e.target===document.body)e.preventDefault()},{passive:false});
 }
 </script>
 </body>
